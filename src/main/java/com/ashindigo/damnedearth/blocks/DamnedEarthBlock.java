@@ -16,8 +16,8 @@ import java.util.Random;
 
 public class DamnedEarthBlock extends SpreadableBlock {
 
-    private static final int maxBound = 201;
-    private static final int minBound = 150;
+    static final int maxBound = 201;
+    static final int minBound = 150;
 
     public DamnedEarthBlock(Settings block$Settings_1) {
         super(block$Settings_1);
@@ -34,6 +34,28 @@ public class DamnedEarthBlock extends SpreadableBlock {
         onRandomTick(blockState_1, world_1, blockPos_1, random_1);
     }
 
+    public void spread(BlockState state, World world, BlockPos pos, Random rand) {
+        boolean z = rand.nextBoolean();
+        BlockPos pos1 = new BlockPos(pos.add(!z ? rand.nextInt(4) - 2 : 0, 0, z ? rand.nextInt(4) - 2 : 0));
+        if (Blocks.AIR.getDefaultState().equals(world.getBlockState(pos1.up()))) {
+            if (Blocks.GRASS_BLOCK.getDefaultState().equals(world.getBlockState(pos1)) || Blocks.DIRT.getDefaultState().equals(world.getBlockState(pos1))) {
+                world.setBlockState(pos1, world.getBlockState(pos));
+            }
+        }
+    }
+
+    void spawnMobs(BlockState state, World world, BlockPos pos, Random rand) {
+        if (world.getFluidState(pos.up()).isEmpty()) {
+            if (world.getDifficulty() != Difficulty.PEACEFUL) {
+                List<Biome.SpawnEntry> spawnList = world.getChunkManager().getChunkGenerator().getEntitySpawnList(EntityCategory.MONSTER, pos);
+                Entity entity = spawnList.get(rand.nextInt(spawnList.size())).type.create(world);
+                Objects.requireNonNull(entity).setPosition(pos.getX(), pos.getY() + 1, pos.getZ());
+                world.spawnEntity(entity);
+            }
+        }
+    }
+
+
     @Override
     public void onRandomTick(BlockState state, World world, BlockPos pos, Random rand) {
         world.getBlockTickScheduler().schedule(pos, state.getBlock(), Math.max(minBound, world.random.nextInt(maxBound)));
@@ -42,22 +64,8 @@ public class DamnedEarthBlock extends SpreadableBlock {
                 world.setBlockState(pos, Blocks.DIRT.getDefaultState());
             } else {
                 if (world.getLightLevel(pos.up()) < 10) {
-                    boolean z = rand.nextBoolean();
-                    BlockPos pos1 = new BlockPos(pos.add(!z ? rand.nextInt(4) - 2 : 0, 0, z ? rand.nextInt(4) - 2 : 0));
-                    System.out.println(world.getBlockState(pos1));
-                    if (Blocks.AIR.getDefaultState().equals(world.getBlockState(pos1.up()))) {
-                        if (Blocks.GRASS_BLOCK.getDefaultState().equals(world.getBlockState(pos1)) || Blocks.DIRT.getDefaultState().equals(world.getBlockState(pos1))) {
-                            world.setBlockState(pos1, world.getBlockState(pos));
-                        }
-                    }
-                    if (world.getFluidState(pos.up()).isEmpty()) {
-                        if (world.getDifficulty() != Difficulty.PEACEFUL) {
-                            List<Biome.SpawnEntry> spawnList = world.getChunkManager().getChunkGenerator().getEntitySpawnList(EntityCategory.MONSTER, pos);
-                            Entity entity = spawnList.get(rand.nextInt(spawnList.size())).type.create(world);
-                            Objects.requireNonNull(entity).setPosition(pos.getX(), pos.getY() + 1, pos.getZ());
-                            world.spawnEntity(entity);
-                        }
-                    }
+                    spread(state, world, pos, rand);
+                    spawnMobs(state, world, pos, rand);
                 }
             }
         }
