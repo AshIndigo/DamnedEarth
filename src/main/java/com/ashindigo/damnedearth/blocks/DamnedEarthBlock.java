@@ -1,10 +1,12 @@
 package com.ashindigo.damnedearth.blocks;
 
+import com.ashindigo.damnedearth.MobBlacklist;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SpreadableBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCategory;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
@@ -16,14 +18,15 @@ import java.util.Random;
 
 public class DamnedEarthBlock extends SpreadableBlock {
 
-    static final int maxBound = 201;
-    static final int minBound = 150;
+    private static final int maxBound = 201;
+    private static final int minBound = 150;
 
     public DamnedEarthBlock(Settings block$Settings_1) {
         super(block$Settings_1);
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean isMoving) {
         world.getBlockTickScheduler().schedule(pos, state.getBlock(), Math.max(minBound, world.random.nextInt(maxBound)));
     }
@@ -48,15 +51,20 @@ public class DamnedEarthBlock extends SpreadableBlock {
         if (world.getFluidState(pos.up()).isEmpty()) {
             if (world.getDifficulty() != Difficulty.PEACEFUL) {
                 List<Biome.SpawnEntry> spawnList = world.getChunkManager().getChunkGenerator().getEntitySpawnList(EntityCategory.MONSTER, pos);
-                Entity entity = spawnList.get(rand.nextInt(spawnList.size())).type.create(world);
-                Objects.requireNonNull(entity).setPosition(pos.getX(), pos.getY() + 1, pos.getZ());
-                world.spawnEntity(entity);
+                if (!MobBlacklist.contains(spawnList.get(rand.nextInt(spawnList.size())).type)) {
+                    Entity entity = spawnList.get(rand.nextInt(spawnList.size())).type.create(world);
+                    if (entity instanceof HostileEntity) {
+                        Objects.requireNonNull(entity).setPosition(pos.getX(), pos.getY() + 1, pos.getZ());
+                        world.spawnEntity(entity);
+                    }
+                }
             }
         }
     }
 
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onRandomTick(BlockState state, World world, BlockPos pos, Random rand) {
         world.getBlockTickScheduler().schedule(pos, state.getBlock(), Math.max(minBound, world.random.nextInt(maxBound)));
         if (!world.isClient) {

@@ -1,11 +1,11 @@
 package com.ashindigo.damnedearth.blocks;
 
 import com.ashindigo.damnedearth.DamnedEarth;
+import com.ashindigo.damnedearth.MobBlacklist;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.network.packet.BlockEntityUpdateS2CPacket;
 import net.minecraft.entity.Entity;
@@ -31,16 +31,19 @@ public class DamnedEarthMobBlock extends DamnedEarthBlock implements BlockEntity
 
     @Override
     public void spread(BlockState state, World world, BlockPos pos, Random rand) {
-        boolean z = rand.nextBoolean();
-        BlockPos pos1 = new BlockPos(pos.add(!z ? rand.nextInt(4) - 2 : 0, 0, z ? rand.nextInt(4) - 2 : 0));
-        if (Blocks.AIR.getDefaultState().equals(world.getBlockState(pos1.up()))) {
-            if (Blocks.GRASS_BLOCK.getDefaultState().equals(world.getBlockState(pos1)) || Blocks.DIRT.getDefaultState().equals(world.getBlockState(pos1))) {
-                world.setBlockState(pos1, world.getBlockState(pos));
-                EntityType<?> type = Registry.ENTITY_TYPE.get(Identifier.tryParse(world.getBlockEntity(pos).toTag(new CompoundTag()).getString("mob")));
-                ((DamnedEarthMobTileEntity) world.getBlockEntity(pos1)).setMob(type);
-                world.getBlockEntity(pos1).markDirty();
-            }
-        }
+//        boolean z = rand.nextBoolean();
+//        BlockPos pos1 = new BlockPos(pos.add(!z ? rand.nextInt(4) - 2 : 0, 0, z ? rand.nextInt(4) - 2 : 0));
+//        if (Blocks.AIR.getDefaultState().equals(world.getBlockState(pos1.up()))) {
+//            if (Blocks.GRASS_BLOCK.getDefaultState().equals(world.getBlockState(pos1)) || Blocks.DIRT.getDefaultState().equals(world.getBlockState(pos1))) {
+//                world.setBlockState(pos1, world.getBlockState(pos));
+//               // EntityType<?> type = Registry.ENTITY_TYPE.get(Identifier.tryParse(world.getBlockEntity(pos).toTag(new CompoundTag()).getString("mob")));
+//              //  System.out.println(EntityType.getId(type));
+//                ((DamnedEarthMobTileEntity) world.getBlockEntity(pos1)).setMob(Registry.ENTITY_TYPE.get(Identifier.tryParse(world.getBlockEntity(pos).toTag(new CompoundTag()).getString("mob"))));
+//                world.getBlockEntity(pos1).markDirty();
+//                // TODO NBT doesnt get properly set until world is reloaded
+//            }
+//        }
+        // NO-OP
     }
 
     @Override
@@ -57,9 +60,11 @@ public class DamnedEarthMobBlock extends DamnedEarthBlock implements BlockEntity
     @Override
     void spawnMobs(BlockState state, World world, BlockPos pos, Random rand) {
         if (world.getDifficulty() != Difficulty.PEACEFUL) {
-            Entity toSpawn = ((DamnedEarthMobTileEntity) Objects.requireNonNull(world.getBlockEntity(pos))).getMob().create(world);
-            Objects.requireNonNull(toSpawn).setPosition(pos.getX(), pos.getY() + 1, pos.getZ());
-            world.spawnEntity(toSpawn);
+            if (!MobBlacklist.contains(((DamnedEarthMobTileEntity) Objects.requireNonNull(world.getBlockEntity(pos))).getMob())) {
+                Entity toSpawn = ((DamnedEarthMobTileEntity) Objects.requireNonNull(world.getBlockEntity(pos))).getMob().create(world);
+                Objects.requireNonNull(toSpawn).setPosition(pos.getX(), pos.getY() + 1, pos.getZ());
+                world.spawnEntity(toSpawn);
+            }
         }
     }
 
@@ -68,7 +73,7 @@ public class DamnedEarthMobBlock extends DamnedEarthBlock implements BlockEntity
     public ItemStack getPickStack(BlockView blockView_1, BlockPos blockPos_1, BlockState blockState_1) {
         ItemStack stack = new ItemStack(this);
         CompoundTag tag = new CompoundTag();
-        tag.putString("mob", blockView_1.getBlockEntity(blockPos_1).toTag(new CompoundTag()).getString("mob"));
+        tag.putString("mob", Objects.requireNonNull(blockView_1.getBlockEntity(blockPos_1)).toTag(new CompoundTag()).getString("mob"));
         stack.setTag(tag);
         return stack;
     }
