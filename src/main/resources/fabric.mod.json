@@ -18,6 +18,9 @@
   "entrypoints": {
     "main": [
       "com.ashindigo.damnedearth.DamnedEarth"
+    ],
+    "client": [
+      "com.ashindigo.damnedearth.DamnedEarthClient"
     ]
   },
   "mixins": [
