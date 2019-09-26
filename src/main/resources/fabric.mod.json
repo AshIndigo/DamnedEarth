@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "damnedearth",
+  "version": "${version}",
+
+  "name": "Damned Earth",
+  "description": "This is an example description! Tell everyone what your mod is about!",
+  "authors": [
+    "AshIndigo", "Ace Muffins (Textures)", "No (Textures)"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/AshIndigo/DamnedEarth"
+  },
+  "icon": "assets/damnedearth/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.ashindigo.damnedearth.DamnedEarth"
+    ]
+  },
+  "mixins": [
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.4.0",
+    "fabric": "*"
+  }
+}
