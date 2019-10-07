@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class MobBlacklist {
 
-    private static ArrayList<EntityType<?>> blacklist = new ArrayList<>();
+    private static final ArrayList<EntityType<?>> blacklist = new ArrayList<>();
 
     public static void init() {
         addEntry(EntityType.AREA_EFFECT_CLOUD);
@@ -53,10 +53,12 @@ public class MobBlacklist {
         addEntry(EntityType.WITHER);
 }
 
+    @SuppressWarnings("WeakerAccess")
     public static void addEntry(EntityType<?> type) {
         blacklist.add(type);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean contains(EntityType<?> type) {
         return blacklist.contains(type);
     }

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "#X#",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "damnedearth:speckofevil"
+    },
+    "X": {
+      "item": "minecraft:grass_block"
+    }
+  },
+  "result": {
+    "item": "damnedearth:damnedearth"
+  }
+}

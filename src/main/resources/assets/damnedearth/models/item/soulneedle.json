@@ -1,0 +1,14 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "damnedearth:items/soulneedle"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "damnedearth:filled": 1
+            },
+            "model": "damnedearth:item/soulneedle_full"
+        }
+    ]
+}

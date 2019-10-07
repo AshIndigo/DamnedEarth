@@ -1,20 +1,20 @@
 package com.ashindigo.damnedearth.blocks;
 
-import com.ashindigo.damnedearth.DamnedEarth;
 import com.ashindigo.damnedearth.MobBlacklist;
+import com.ashindigo.damnedearth.tileentity.DamnedEarthMobTileEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.network.packet.BlockEntityUpdateS2CPacket;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.Difficulty;
@@ -30,19 +30,7 @@ public class DamnedEarthMobBlock extends DamnedEarthBlock implements BlockEntity
     }
 
     @Override
-    public void spread(BlockState state, World world, BlockPos pos, Random rand) {
-//        boolean z = rand.nextBoolean();
-//        BlockPos pos1 = new BlockPos(pos.add(!z ? rand.nextInt(4) - 2 : 0, 0, z ? rand.nextInt(4) - 2 : 0));
-//        if (Blocks.AIR.getDefaultState().equals(world.getBlockState(pos1.up()))) {
-//            if (Blocks.GRASS_BLOCK.getDefaultState().equals(world.getBlockState(pos1)) || Blocks.DIRT.getDefaultState().equals(world.getBlockState(pos1))) {
-//                world.setBlockState(pos1, world.getBlockState(pos));
-//               // EntityType<?> type = Registry.ENTITY_TYPE.get(Identifier.tryParse(world.getBlockEntity(pos).toTag(new CompoundTag()).getString("mob")));
-//              //  System.out.println(EntityType.getId(type));
-//                ((DamnedEarthMobTileEntity) world.getBlockEntity(pos1)).setMob(Registry.ENTITY_TYPE.get(Identifier.tryParse(world.getBlockEntity(pos).toTag(new CompoundTag()).getString("mob"))));
-//                world.getBlockEntity(pos1).markDirty();
-//                // TODO NBT doesnt get properly set until world is reloaded
-//            }
-//        }
+    public void spread(World world, BlockPos pos, Random rand) {
         // NO-OP
     }
 
@@ -58,11 +46,17 @@ public class DamnedEarthMobBlock extends DamnedEarthBlock implements BlockEntity
     }
 
     @Override
-    void spawnMobs(BlockState state, World world, BlockPos pos, Random rand) {
+    void spawnMobs(World world, BlockPos pos, Random rand) {
         if (world.getDifficulty() != Difficulty.PEACEFUL) {
             if (!MobBlacklist.contains(((DamnedEarthMobTileEntity) Objects.requireNonNull(world.getBlockEntity(pos))).getMob())) {
+                if (world.getEntities(HostileEntity.class, new Box(pos, pos.add(1, 3, 1))).size() > 1) {
+                    return;
+                }
                 Entity toSpawn = ((DamnedEarthMobTileEntity) Objects.requireNonNull(world.getBlockEntity(pos))).getMob().create(world);
-                Objects.requireNonNull(toSpawn).setPosition(pos.getX(), pos.getY() + 1, pos.getZ());
+                Objects.requireNonNull(toSpawn).setPosition(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
+                if (world.isAreaNotEmpty(toSpawn.getBoundingBox()) || !world.doesNotCollide(toSpawn)) {
+                    return;
+                }
                 world.spawnEntity(toSpawn);
             }
         }
@@ -83,43 +77,4 @@ public class DamnedEarthMobBlock extends DamnedEarthBlock implements BlockEntity
         return new DamnedEarthMobTileEntity();
     }
 
-    public static class DamnedEarthMobTileEntity extends BlockEntity {
-
-        EntityType<?> mob = EntityType.PIG;
-
-        public DamnedEarthMobTileEntity() {
-            super(DamnedEarth.mobTEType);
-        }
-
-        @Override
-        public BlockEntityUpdateS2CPacket toUpdatePacket() {
-            return new BlockEntityUpdateS2CPacket(this.pos, 2, this.toInitialChunkDataTag());
-        }
-
-        @Override
-        public CompoundTag toInitialChunkDataTag() {
-            return this.toTag(new CompoundTag());
-        }
-
-        @Override
-        public void fromTag(CompoundTag tag) {
-            super.fromTag(tag);
-            mob = Registry.ENTITY_TYPE.get(Identifier.tryParse(tag.getString("mob")));
-        }
-
-        @Override
-        public CompoundTag toTag(CompoundTag tag) {
-            super.toTag(tag);
-            tag.putString("mob", EntityType.getId(mob).toString());
-            return tag;
-        }
-
-        public EntityType<?> getMob() {
-            return mob;
-        }
-
-        void setMob(EntityType<?> mob) {
-            this.mob = mob;
-        }
-    }
 }

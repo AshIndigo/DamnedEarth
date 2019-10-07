@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCategory;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -37,7 +38,7 @@ public class DamnedEarthBlock extends SpreadableBlock {
         onRandomTick(blockState_1, world_1, blockPos_1, random_1);
     }
 
-    public void spread(BlockState state, World world, BlockPos pos, Random rand) {
+    void spread(World world, BlockPos pos, Random rand) {
         boolean z = rand.nextBoolean();
         BlockPos pos1 = new BlockPos(pos.add(!z ? rand.nextInt(4) - 2 : 0, 0, z ? rand.nextInt(4) - 2 : 0));
         if (Blocks.AIR.getDefaultState().equals(world.getBlockState(pos1.up()))) {
@@ -47,14 +48,18 @@ public class DamnedEarthBlock extends SpreadableBlock {
         }
     }
 
-    void spawnMobs(BlockState state, World world, BlockPos pos, Random rand) {
+    void spawnMobs(World world, BlockPos pos, Random rand) {
         if (world.getFluidState(pos.up()).isEmpty()) {
             if (world.getDifficulty() != Difficulty.PEACEFUL) {
                 List<Biome.SpawnEntry> spawnList = world.getChunkManager().getChunkGenerator().getEntitySpawnList(EntityCategory.MONSTER, pos);
-                if (!MobBlacklist.contains(spawnList.get(rand.nextInt(spawnList.size())).type)) {
-                    Entity entity = spawnList.get(rand.nextInt(spawnList.size())).type.create(world);
+                int i = rand.nextInt(spawnList.size());
+                if (!MobBlacklist.contains(spawnList.get(i).type)) {
+                    Entity entity = spawnList.get(i).type.create(world);
+                    if (world.getEntities(HostileEntity.class, new Box(pos, pos.add(1, 3, 1))).size() > 1) {
+                        return;
+                    }
                     if (entity instanceof HostileEntity) {
-                        Objects.requireNonNull(entity).setPosition(pos.getX(), pos.getY() + 1, pos.getZ());
+                        Objects.requireNonNull(entity).setPosition(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
                         world.spawnEntity(entity);
                     }
                 }
@@ -72,8 +77,8 @@ public class DamnedEarthBlock extends SpreadableBlock {
                 world.setBlockState(pos, Blocks.DIRT.getDefaultState());
             } else {
                 if (world.getLightLevel(pos.up()) < 10) {
-                    spread(state, world, pos, rand);
-                    spawnMobs(state, world, pos, rand);
+                    spread(world, pos, rand);
+                    spawnMobs(world, pos, rand);
                 }
             }
         }

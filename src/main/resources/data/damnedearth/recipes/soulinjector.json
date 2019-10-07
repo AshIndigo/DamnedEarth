@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " Z ",
+    "#X#",
+    "SSS"
+  ],
+  "key": {
+    "#": {
+      "item": "damnedearth:speckofevil"
+    },
+    "X": {
+      "item": "minecraft:furnace"
+    },
+    "Z": {
+      "item": "damnedearth:soulneedle"
+    },
+    "S": {
+      "item": "minecraft:cobblestone"
+    }
+  },
+  "result": {
+    "item": "damnedearth:soulinjector"
+  }
+}

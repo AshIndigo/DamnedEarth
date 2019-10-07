@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "ZXZ",
+    " # "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:iron_ingot"
+    },
+    "X": {
+      "item": "minecraft:glass"
+    },
+    "Z": {
+      "item": "minecraft:iron_nugget"
+    }
+  },
+  "result": {
+    "item": "damnedearth:soulneedle"
+  }
+}

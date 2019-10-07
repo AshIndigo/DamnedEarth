@@ -1,4 +1,8 @@
 {
   "block.damnedearth.damnedearth": "Damned Earth",
-  "block.damnedearth.damnedearthmob": "Monstrous Damned Earth"
+  "block.damnedearth.damnedearthmob": "Monstrous Damned Earth",
+  "block.damnedearth.soulinjector": "Soul Injector",
+  "container.damnedearth.soulinjector": "Soul Injector",
+  "item.damnedearth.soulneedle": "Soul Needle",
+  "item.damnedearth.speckofevil": "Speck of Evil"
 }
