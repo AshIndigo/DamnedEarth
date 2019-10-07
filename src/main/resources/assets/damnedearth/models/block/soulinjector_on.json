@@ -1,0 +1,8 @@
+{
+    "parent": "block/orientable",
+    "textures": {
+        "top": "damnedearth:block/soulinjector_top",
+        "front": "damnedearth:block/soulinjector_front_on",
+        "side": "damnedearth:block/soulinjector_side"
+    }
+}
