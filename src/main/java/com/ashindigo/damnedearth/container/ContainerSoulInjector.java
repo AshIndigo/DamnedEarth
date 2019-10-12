@@ -119,7 +119,6 @@ public class ContainerSoulInjector extends Container {
         return AbstractFurnaceBlockEntity.createFuelTimeMap().containsKey(stack.getItem());
     }
 
-
     @Override
     public boolean canUse(PlayerEntity var1) {
         return true;
