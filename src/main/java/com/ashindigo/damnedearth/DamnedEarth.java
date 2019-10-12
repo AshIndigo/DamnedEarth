@@ -31,9 +31,9 @@ import net.minecraft.world.loot.ConstantLootTableRange;
 import net.minecraft.world.loot.entry.ItemEntry;
 
 import java.util.List;
+import java.util.Objects;
 
 // TODO Texture for soul injector, speck of evil
-// TODO MP Testing
 public class DamnedEarth implements ModInitializer {
 
     public static final String MODID = "damnedearth";
@@ -74,7 +74,7 @@ public class DamnedEarth implements ModInitializer {
         Registry.register(Registry.BLOCK_ENTITY, soulInjectorID, soulInjectorType);
         ItemSoulNeedle soulNeedle = new ItemSoulNeedle(new Item.Settings().group(ItemGroup.MISC));
         Registry.register(Registry.ITEM, new Identifier(MODID, "soulneedle"), soulNeedle);
-        soulInjectorContainer = (syncId, identifier, player, buf) -> ((ContainerProvider) player.world.getBlockEntity(buf.readBlockPos())).createMenu(syncId, player.inventory, player);
+        soulInjectorContainer = (syncId, identifier, player, buf) -> ((ContainerProvider) Objects.requireNonNull(player.world.getBlockEntity(buf.readBlockPos()))).createMenu(syncId, player.inventory, player);
         ContainerProviderRegistry.INSTANCE.registerFactory(soulInjectorID, soulInjectorContainer);
         Registry.register(Registry.ITEM, new Identifier(MODID, "speckofevil"), new Item(new Item.Settings().group(ItemGroup.MISC)));
         LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id, supplier, setter) -> {

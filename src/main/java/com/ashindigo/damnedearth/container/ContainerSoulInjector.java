@@ -60,6 +60,7 @@ public class ContainerSoulInjector extends Container {
         for (int i = 0; i < 9; ++i) {
             this.addSlot(new Slot(inventory, i, 8 + i * 18, 142));
         }
+        this.addProperties(propertyDelegate);
     }
 
     @Override
@@ -87,11 +88,11 @@ public class ContainerSoulInjector extends Container {
                     if (!this.insertItem(itemStack_2, SoulInjectorTileEntity.soulNeedleSlot, 2, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (int_1 >= 3 && int_1 < 30) {
+                } else if (int_1 < 30) {
                     if (!this.insertItem(itemStack_2, 30, 39, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (int_1 >= 30 && int_1 < 39 && !this.insertItem(itemStack_2, 3, 30, false)) {
+                } else if (int_1 < 39 && !this.insertItem(itemStack_2, 3, 30, false)) {
                     return ItemStack.EMPTY;
                 }
             } else if (!this.insertItem(itemStack_2, 3, 39, false)) {

@@ -127,49 +127,49 @@ public class SoulInjectorTileEntity extends BlockEntity implements NameableConta
             --this.burnTime;
         }
 
-        //if (world != null && !world.isClient) {
-        ItemStack itemStack = this.inventory.getInvStack(fuelSlot);
-        if (!this.isBurning() && (itemStack.isEmpty() || this.inventory.getInvStack(earthSlot).isEmpty()) && !inventory.getInvStack(soulNeedleSlot).isEmpty()) {
-            if (!this.isBurning() && this.cookTime > 0) {
-                this.cookTime = MathHelper.clamp(this.cookTime - 2, 0, this.cookTimeTotal);
-            }
-        } else {
-            SoulInjectorRecipe recipe = new SoulInjectorRecipe();
-            if (!this.isBurning() && this.canAcceptRecipeOutput(recipe) && !inventory.getInvStack(soulNeedleSlot).isEmpty()) {
-                this.burnTime = this.getFuelTime(itemStack);
-                this.fuelTime = this.burnTime;
-                if (this.isBurning()) {
-                    running = true;
-                    if (!itemStack.isEmpty()) {
-                        Item item = itemStack.getItem();
-                        itemStack.decrement(1);
-                        if (itemStack.isEmpty()) {
-                            Item item_2 = item.getRecipeRemainder();
-                            this.inventory.setInvStack(fuelSlot, item_2 == null ? ItemStack.EMPTY : new ItemStack(item_2));
+        if (world != null && !world.isClient) {
+            ItemStack itemStack = this.inventory.getInvStack(fuelSlot);
+            if (!this.isBurning() && (itemStack.isEmpty() || this.inventory.getInvStack(earthSlot).isEmpty()) && !inventory.getInvStack(soulNeedleSlot).isEmpty()) {
+                if (!this.isBurning() && this.cookTime > 0) {
+                    this.cookTime = MathHelper.clamp(this.cookTime - 2, 0, this.cookTimeTotal);
+                }
+            } else {
+                SoulInjectorRecipe recipe = new SoulInjectorRecipe();
+                if (!this.isBurning() && this.canAcceptRecipeOutput(recipe) && !inventory.getInvStack(soulNeedleSlot).isEmpty()) {
+                    this.burnTime = this.getFuelTime(itemStack);
+                    this.fuelTime = this.burnTime;
+                    if (this.isBurning()) {
+                        running = true;
+                        if (!itemStack.isEmpty()) {
+                            Item item = itemStack.getItem();
+                            itemStack.decrement(1);
+                            if (itemStack.isEmpty()) {
+                                Item item_2 = item.getRecipeRemainder();
+                                this.inventory.setInvStack(fuelSlot, item_2 == null ? ItemStack.EMPTY : new ItemStack(item_2));
+                            }
                         }
                     }
                 }
-            }
 
-            if (this.isBurning() && this.canAcceptRecipeOutput(recipe) && !inventory.getInvStack(soulNeedleSlot).isEmpty()) {
-                ++this.cookTime;
-                if (this.cookTime == this.cookTimeTotal) {
+                if (this.isBurning() && this.canAcceptRecipeOutput(recipe) && !inventory.getInvStack(soulNeedleSlot).isEmpty()) {
+                    ++this.cookTime;
+                    if (this.cookTime == this.cookTimeTotal) {
+                        this.cookTime = 0;
+                        this.craftRecipe(recipe);
+                        running = true;
+                    }
+                } else {
                     this.cookTime = 0;
-                    this.craftRecipe(recipe);
-                    running = true;
                 }
-            } else {
-                this.cookTime = 0;
             }
-        }
 
-        if (burning != this.isBurning()) {
-            running = true;
-            if (this.world != null) {
-                this.world.setBlockState(this.pos, this.world.getBlockState(this.pos).with(SoulInjectorBlock.LIT, this.isBurning()), 3);
+            if (burning != this.isBurning()) {
+                running = true;
+                if (this.world != null) {
+                    this.world.setBlockState(this.pos, this.world.getBlockState(this.pos).with(SoulInjectorBlock.LIT, this.isBurning()), 3);
+                }
             }
         }
-        //}
 
         if (running) {
             this.markDirty();
@@ -247,10 +247,14 @@ public class SoulInjectorTileEntity extends BlockEntity implements NameableConta
         @Override
         public boolean canInsertInvStack(int slot, ItemStack stack, Direction dir) {
             switch (slot) {
-                case fuelSlot: return AbstractFurnaceBlockEntity.createFuelTimeMap().containsKey(stack.getItem());
-                case soulNeedleSlot: return stack.getItem() instanceof ItemSoulNeedle;
-                case earthSlot: return Block.getBlockFromItem(stack.getItem()) instanceof DamnedEarthBlock;
-                default: return false;
+                case fuelSlot:
+                    return AbstractFurnaceBlockEntity.createFuelTimeMap().containsKey(stack.getItem());
+                case soulNeedleSlot:
+                    return stack.getItem() instanceof ItemSoulNeedle;
+                case earthSlot:
+                    return Block.getBlockFromItem(stack.getItem()) instanceof DamnedEarthBlock;
+                default:
+                    return false;
             }
         }
 
