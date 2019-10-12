@@ -7,7 +7,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
-import net.minecraft.container.*;
+import net.minecraft.container.Container;
+import net.minecraft.container.PropertyDelegate;
+import net.minecraft.container.Slot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -41,7 +43,7 @@ public class ContainerSoulInjector extends Container {
                 return Block.getBlockFromItem(stack.getItem()) instanceof DamnedEarthBlock;
             }
         });
-        
+
         this.addSlot(new Slot(te.getInventory(null, null, null), 3, 116, 35) { // Damned Mob Earth Result Slot
             @Override
             public boolean canInsert(ItemStack stack) {
@@ -49,53 +51,71 @@ public class ContainerSoulInjector extends Container {
             }
         });
         // Player Inventory
-        for(int i = 0; i < 3; ++i) {
-            for(int x = 0; x < 9; ++x) {
+        for (int i = 0; i < 3; ++i) {
+            for (int x = 0; x < 9; ++x) {
                 this.addSlot(new Slot(inventory, x + i * 9 + 9, 8 + x * 18, 84 + i * 18));
             }
         }
 
-        for(int i = 0; i < 9; ++i) {
+        for (int i = 0; i < 9; ++i) {
             this.addSlot(new Slot(inventory, i, 8 + i * 18, 142));
         }
     }
 
     @Override
-    // TODO Proper Slot transfer behavior
-    public ItemStack transferSlot(PlayerEntity player, int i) {
-        ItemStack stack1 = ItemStack.EMPTY;
-        Slot slot1 = this.slotList.get(i);
-        if (slot1 != null && slot1.hasStack()) {
-            ItemStack stack2 = slot1.getStack();
-            stack1 = stack2.copy();
-            if (i == 2) {
-                if (!this.insertItem(stack2, 3, 39, true)) {
+    public ItemStack transferSlot(PlayerEntity playerEntity_1, int int_1) {
+        ItemStack itemStack_1 = ItemStack.EMPTY;
+        Slot slot_1 = this.slotList.get(int_1);
+        if (slot_1 != null && slot_1.hasStack()) {
+            ItemStack itemStack_2 = slot_1.getStack();
+            itemStack_1 = itemStack_2.copy();
+            if (int_1 == 2) {
+                if (!this.insertItem(itemStack_2, 3, 39, true)) {
                     return ItemStack.EMPTY;
                 }
-
-                slot1.onStackChanged(stack2, stack1);
-            } else if (i != 1 && i != 0) {
-                if (!this.insertItem(stack2, 0, 1, false)) {
+                slot_1.onStackChanged(itemStack_2, itemStack_1);
+            } else if (int_1 != 1 && int_1 != 0) {
+                if (Block.getBlockFromItem(itemStack_2.getItem()) instanceof DamnedEarthBlock) {
+                    if (!this.insertItem(itemStack_2, SoulInjectorTileEntity.earthSlot, 3, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                } else if (this.isFuel(itemStack_2)) {
+                    if (!this.insertItem(itemStack_2, SoulInjectorTileEntity.fuelSlot, 2, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                } else if (itemStack_2.getItem() instanceof ItemSoulNeedle) {
+                    if (!this.insertItem(itemStack_2, SoulInjectorTileEntity.soulNeedleSlot, 2, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                } else if (int_1 >= 3 && int_1 < 30) {
+                    if (!this.insertItem(itemStack_2, 30, 39, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                } else if (int_1 >= 30 && int_1 < 39 && !this.insertItem(itemStack_2, 3, 30, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.insertItem(stack2, 3, 39, false)) {
+            } else if (!this.insertItem(itemStack_2, 3, 39, false)) {
                 return ItemStack.EMPTY;
             }
 
-            if (stack2.isEmpty()) {
-                slot1.setStack(ItemStack.EMPTY);
+            if (itemStack_2.isEmpty()) {
+                slot_1.setStack(ItemStack.EMPTY);
             } else {
-                slot1.markDirty();
+                slot_1.markDirty();
             }
 
-            if (stack2.getCount() == stack1.getCount()) {
+            if (itemStack_2.getCount() == itemStack_1.getCount()) {
                 return ItemStack.EMPTY;
             }
 
-            slot1.onTakeItem(player, stack2);
+            slot_1.onTakeItem(playerEntity_1, itemStack_2);
         }
 
-        return stack1;
+        return itemStack_1;
+    }
+
+    private boolean isFuel(ItemStack stack) {
+        return AbstractFurnaceBlockEntity.createFuelTimeMap().containsKey(stack.getItem());
     }
 
 

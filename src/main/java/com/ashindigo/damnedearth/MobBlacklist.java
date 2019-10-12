@@ -8,7 +8,7 @@ public class MobBlacklist {
 
     private static final ArrayList<EntityType<?>> blacklist = new ArrayList<>();
 
-    public static void init() {
+    static void init() {
         addEntry(EntityType.AREA_EFFECT_CLOUD);
         addEntry(EntityType.ARMOR_STAND);
         addEntry(EntityType.ARROW);

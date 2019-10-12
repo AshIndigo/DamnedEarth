@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.container.ContainerProviderRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateFactory;
 import net.minecraft.state.property.BooleanProperty;
@@ -15,10 +16,13 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
+import java.util.Objects;
+
 @SuppressWarnings("deprecation")
-public class SoulInjectorBlock extends BlockWithEntity {
+public class SoulInjectorBlock extends BlockWithEntity implements InventoryProvider {
 
     private static final DirectionProperty FACING;
     public static final BooleanProperty LIT;
@@ -88,5 +92,10 @@ public class SoulInjectorBlock extends BlockWithEntity {
     static {
         FACING = HorizontalFacingBlock.FACING;
         LIT = RedstoneTorchBlock.LIT;
+    }
+
+    @Override
+    public SidedInventory getInventory(BlockState var1, IWorld var2, BlockPos var3) {
+        return ((InventoryProvider) Objects.requireNonNull(var2.getBlockEntity(var3))).getInventory(var1, var2, var3);
     }
 }

@@ -33,6 +33,7 @@ import net.minecraft.world.loot.entry.ItemEntry;
 import java.util.List;
 
 // TODO Texture for soul injector, speck of evil
+// TODO MP Testing
 public class DamnedEarth implements ModInitializer {
 
     public static final String MODID = "damnedearth";
@@ -68,7 +69,7 @@ public class DamnedEarth implements ModInitializer {
         Registry.register(Registry.BLOCK_ENTITY, damnedEarthMobID, mobTEType);
         soulInjectorBlock = new SoulInjectorBlock(FabricBlockSettings.of(Material.STONE, MaterialColor.GRAY).lightLevel(13).build());
         Registry.register(Registry.BLOCK, soulInjectorID, soulInjectorBlock);
-        Registry.register(Registry.ITEM, soulInjectorID, new BlockItem(soulInjectorBlock, new Item.Settings().group(ItemGroup.MISC)));
+        Registry.register(Registry.ITEM, soulInjectorID, new BlockItem(soulInjectorBlock, new Item.Settings().group(ItemGroup.MISC).maxCount(1)));
         soulInjectorType = BlockEntityType.Builder.create(SoulInjectorTileEntity::new, soulInjectorBlock).build(null);
         Registry.register(Registry.BLOCK_ENTITY, soulInjectorID, soulInjectorType);
         ItemSoulNeedle soulNeedle = new ItemSoulNeedle(new Item.Settings().group(ItemGroup.MISC));
